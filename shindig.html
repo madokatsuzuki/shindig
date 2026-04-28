@@ -444,6 +444,53 @@
   }
   .consult-list li::before { content: '▶'; position: absolute; left: 0; color: #e8b4c8; font-size: 10px; top: 4px; }
 
+  /* 楽稼ぎ比較カード */
+  .easy-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .easy-card {
+    background: white;
+    border: 1px solid #e8d0dc;
+    border-radius: 14px;
+    padding: 14px 16px;
+  }
+  .easy-card-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .easy-icon { font-size: 20px; }
+  .easy-name { font-size: 15px; font-weight: 700; color: #3a2b38; }
+  .easy-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+  .easy-tag {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .tag-motode  { background: #f5eef2; color: #8a6878; }
+  .tag-risk-high { background: #fce8e8; color: #c06060; }
+  .tag-risk-low  { background: #e8f5ee; color: #4a9060; }
+  .tag-risk-none { background: #f0f0f8; color: #7878a8; }
+  .tag-ceil      { background: #fef5e0; color: #a08040; }
+  .tag-ceil-low  { background: #f8f0f5; color: #b08898; }
+  .easy-card-note {
+    font-size: 12px;
+    color: #b08898;
+    line-height: 1.6;
+    padding-left: 28px;
+  }
+
   /* 免責文 */
   .disclaimer {
     font-size: 11px;
@@ -482,9 +529,9 @@
     <div class="tap-hint">👆 当てはまるものをタップして進んでください</div>
     <div class="choices">
       <button class="choice-btn" onclick="next('q2')">
-        <span class="choice-emoji">🌸</span>難しい作業はできないけれど、コツコツと自分の手で着実に稼げるようになりたい
+        <span class="choice-emoji">🌸</span>コツコツと着実に稼ぎたい
       </button>
-      <button class="choice-btn hard" onclick="next('result_easy')">
+      <button class="choice-btn hard" onclick="next('q_easy2')">
         <span class="choice-emoji">⚡</span>とりあえず楽してたくさん稼ぎたい
         <span class="choice-note">※ 投資・FXなども含め正直にお伝えします</span>
       </button>
@@ -506,7 +553,7 @@
       </button>
       <button class="choice-btn hard" onclick="next('q_skill')">
         <span class="choice-emoji">🎨</span>スキルを身につけてクリエイティブな仕事がしたい
-        <span class="choice-note">※ 動画編集・ライター・デザインなど（始めるまでに時間がかかります）</span>
+        <span class="choice-note">※ 動画編集・ライター・デザインなど</span>
       </button>
     </div>
   </div>
@@ -550,35 +597,126 @@
     </div>
   </div>
 
+  <!-- ===== Q楽2（収入目標）===== -->
+  <div class="question-card" id="q_easy2">
+    <div class="q-number">QUESTION 02</div>
+    <div class="q-text">月にどのくらい<br>稼ぎたいですか？</div>
+    <div class="q-sub">今の目標で大丈夫です。</div>
+    <div class="tap-hint">👆 当てはまるものをタップして進んでください</div>
+    <div class="choices">
+      <button class="choice-btn" onclick="next('q_easy3')">
+        <span class="choice-emoji">🌱</span>月5万円くらい
+      </button>
+      <button class="choice-btn" onclick="next('q_easy3')">
+        <span class="choice-emoji">🌿</span>月10〜30万円
+      </button>
+      <button class="choice-btn" onclick="next('q_easy3')">
+        <span class="choice-emoji">🚀</span>月100万円以上
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== Q楽3（元手）===== -->
+  <div class="question-card" id="q_easy3">
+    <div class="q-number">QUESTION 03</div>
+    <div class="q-text">今すぐ使える<br>元手（資金）はありますか？</div>
+    <div class="q-sub">正直な答えが一番です。</div>
+    <div class="tap-hint">👆 当てはまるものをタップして進んでください</div>
+    <div class="choices">
+      <button class="choice-btn" onclick="next('q_easy4')">
+        <span class="choice-emoji">💰</span>ある（数十万〜）
+      </button>
+      <button class="choice-btn" onclick="next('q_easy4')">
+        <span class="choice-emoji">🌱</span>少しならある（数万円程度）
+      </button>
+      <button class="choice-btn" onclick="next('q_easy4')">
+        <span class="choice-emoji">😅</span>ほとんどない
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== Q楽4（リスク）===== -->
+  <div class="question-card" id="q_easy4">
+    <div class="q-number">QUESTION 04</div>
+    <div class="q-text">リスクについて<br>どう考えていますか？</div>
+    <div class="q-sub">どれが一番近いですか？</div>
+    <div class="tap-hint">👆 当てはまるものをタップして進んでください</div>
+    <div class="choices">
+      <button class="choice-btn" onclick="next('result_easy')">
+        <span class="choice-emoji">📈</span>多少のリスクがあっても大きく稼ぎたい
+      </button>
+      <button class="choice-btn" onclick="next('result_easy')">
+        <span class="choice-emoji">🤔</span>リスクはできるだけ避けたいけど、元手ゼロは難しいと思う
+      </button>
+      <button class="choice-btn" onclick="next('result_easy')">
+        <span class="choice-emoji">🙅</span>損するのは絶対に嫌。リスクゼロじゃないと無理
+      </button>
+    </div>
+  </div>
+
   <!-- ===== 結果: 楽に稼ぎたい ===== -->
   <div class="result-card" id="result_easy">
     <div class="result-label">▷ 診断結果</div>
+
+    <div class="result-title">「楽して稼げる」と<br>言われがちな在宅ワーク</div>
+    <div class="result-text" style="font-size:13px; color:#b08898; margin-bottom:16px;">
+      ※ いずれも実際には決して楽ではありません。
+    </div>
+
+    <!-- 比較カード -->
+    <div class="easy-cards">
+      <div class="easy-card">
+        <div class="easy-card-top">
+          <span class="easy-icon">📈</span>
+          <span class="easy-name">投資・FX</span>
+        </div>
+        <div class="easy-tags">
+          <span class="easy-tag tag-motode">元手：必要</span>
+          <span class="easy-tag tag-risk-high">リスク：高い</span>
+          <span class="easy-tag tag-ceil">収入の天井：上限なし</span>
+        </div>
+        <div class="easy-card-note">知識と損失リスクが伴う</div>
+      </div>
+      <div class="easy-card">
+        <div class="easy-card-top">
+          <span class="easy-icon">✍️</span>
+          <span class="easy-name">アフィリエイト</span>
+        </div>
+        <div class="easy-tags">
+          <span class="easy-tag tag-motode">元手：不要</span>
+          <span class="easy-tag tag-risk-low">リスク：低い</span>
+          <span class="easy-tag tag-ceil">収入の天井：高い</span>
+        </div>
+        <div class="easy-card-note">結果が出るまで1年以上かかることがほとんど</div>
+      </div>
+      <div class="easy-card">
+        <div class="easy-card-top">
+          <span class="easy-icon">🎁</span>
+          <span class="easy-name">ポイ活・アンケート</span>
+        </div>
+        <div class="easy-tags">
+          <span class="easy-tag tag-motode">元手：不要</span>
+          <span class="easy-tag tag-risk-none">リスク：なし</span>
+          <span class="easy-tag tag-ceil-low">収入の天井：月数千円</span>
+        </div>
+        <div class="easy-card-note">お小遣い程度が現実的な上限</div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- まどかのメッセージ -->
     <div class="honest-box">
       <div class="icon">💬</div>
-      <p>正直にお伝えします。</p>
+      <p>
+        うちのスクールのノウハウには、メルカリ物販やインスタおうちショップなどがあります。<br><br>
+        実際に、<strong>月100万円を達成している人もいます。</strong><br><br>
+        楽して稼いでいるわけではありません。正しい手順でコツコツ動いた結果です。<br><br>
+        興味のある方は、ぜひご連絡ください。
+      </p>
     </div>
-    <div class="result-title">「楽に稼げる在宅ワーク」は<br>ありません。</div>
-    <div class="result-text">
-      よく名前が出る方法を正直に言うと—
-    </div>
-    <div class="hard-box">
-      <div class="hard-title">△ "楽して稼げる"と言われるものの現実</div>
-      <ul class="hard-list">
-        <li><strong style="color:#7a5868">投資・FX</strong>：元手が必要で、損をするリスクもある。知識なしでは危険。</li>
-        <li><strong style="color:#7a5868">アフィリエイト</strong>：成果が出るまで1年以上かかることがほとんど。</li>
-        <li><strong style="color:#7a5868">ポイ活・アンケート</strong>：月数百〜数千円が限界。生活を変えられない。</li>
-        <li><strong style="color:#7a5868">外でパート・派遣</strong>：働いた時間分だけ確実に時給をもらえる、実はこれが一番確実。</li>
-      </ul>
-    </div>
-    <div class="result-text">
-      それでも「在宅で、自分のペースで、手順通りに動いた分だけ稼げる方法」を求めているなら—
-    </div>
-    <hr class="divider">
-    <div class="bridge">
-      <div class="bridge-title">💡 実は一番"無駄が少ない"スタートが</div>
-      <p>【メルカリ物販】は投資リスクもなく、スキル習得期間もなく、<strong>手順を覚えて動いた分だけ結果が出る</strong>仕組みです。楽ではないけれど、他の方法と比べて最短で現実的な収入につながります。</p>
-    </div>
-    <button class="cta-btn" onclick="lineOpen()">▶ まず話だけ聞いてみる（無料）</button>
+
+    <button class="cta-btn" onclick="lineOpen()">▶ 気になる方はこちら（無料相談）</button>
     <p class="line-note">↑ ボタンを押すと公式LINEに繋がります。<br>トークに <strong>「相談希望」</strong> とメッセージを送ってください。</p>
     <button class="retry-btn" onclick="restart()">▶ もう一度診断する</button>
   </div>
@@ -695,9 +833,9 @@
         <li>特別なスキル不要。正しい手順で取り組めば結果につながりやすい「再現性」の高さ</li>
         <li>スマホだけで始められる。パソコンが苦手でも関係ない</li>
         <li>動いた分だけ数字に出る。結果が見えるから続けやすい</li>
-        <li>初期費用が少なく、投資リスクがない</li>
+        <li>外注化が可能なため、自分が動かなくてもいい仕組み作りができる</li>
         <li>病気・育児・治療中でも継続できた実績あり（まどか自身がそう）</li>
-        <li>日報サポートで一人で悩まずに進める環境がある</li>
+        <li>専用グループLINEがあるから、遠慮なくなんでも聞けてサポートしてもらえる環境がある</li>
         <li>副業と違い、自分のペースで収入に上限なく積み上げられる</li>
       </ul>
     </div>
@@ -789,6 +927,19 @@
     </div>
 
     <hr class="divider">
+
+    <div class="school-strength">
+      <div class="school-strength-title">うちのスクールのインスタおうちショップが選ばれる理由</div>
+      <ul class="strength-list">
+        <li><strong style="color:#c47898">スクール独自のノウハウ。</strong>このやり方を教えているのはうちのスクールだけ</li>
+        <li>好きなものを売れるから続けやすく、自分のブランドになっていく</li>
+        <li>Instagramのフォロワーが資産になる。ファンが増えるほど収入が安定する</li>
+        <li>外注化が可能なため、自分が動かなくてもいい仕組み作りができる</li>
+        <li>スマホで完結できる。在宅でも十分運営できる</li>
+        <li>メルカリ物販で土台を作ってから自然にステップアップできる</li>
+        <li>専用グループLINEがあるから、遠慮なくなんでも聞けてサポートしてもらえる環境がある</li>
+      </ul>
+    </div>
 
     <div class="course-note">
       <strong>メルカリ物販</strong>と<strong>インスタおうちショップ</strong>は<strong>同じコース内</strong>で目指せます。<strong>SNS発信コース</strong>のみ別コースです。
@@ -956,8 +1107,7 @@
     <div class="hard-box">
       <div class="hard-title">△ スキル系を始める前に知っておいてほしいこと</div>
       <ul class="hard-list">
-        <li>スクール・教材費が数万〜数十万かかることがある</li>
-        <li>習得まで3〜6ヶ月は収入がほぼゼロの期間がある</li>
+<li>習得まで3〜6ヶ月は収入がほぼゼロの期間がある</li>
         <li>最初の案件を取るまでのハードルが高い</li>
         <li>AIの普及で一部ジャンルの単価が下落している</li>
         <li>その間の生活費の見通しが必要</li>
@@ -985,7 +1135,7 @@
 <script>
   let userPath = 'income'; // 'insta' or 'income'
 
-  const stepMap = { q1:1, q2:2, q3:3, q_skill:3 };
+  const stepMap = { q1:1, q2:2, q3:3, q_skill:3, q_easy2:2, q_easy3:3, q_easy4:4 };
 
   function setPath(p) { userPath = p; }
 
