@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>メルカリ知識クイズ</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: linear-gradient(160deg, #f7f1ec 0%, #f5eaee 60%, #eedde5 100%);
+    font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* ===== 背景デコ ===== */
+  body::before, body::after {
+    content: '';
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+  }
+  body::before {
+    width: 320px; height: 320px;
+    background: radial-gradient(circle, rgba(196,120,152,0.12) 0%, transparent 70%);
+    top: -80px; right: -80px;
+  }
+  body::after {
+    width: 280px; height: 280px;
+    background: radial-gradient(circle, rgba(196,120,152,0.10) 0%, transparent 70%);
+    bottom: -60px; left: -60px;
+  }
+  .deco-blob {
+    position: fixed;
+    pointer-events: none;
+    z-index: 0;
+    border-radius: 50%;
+  }
+  .deco-blob1 {
+    width: 180px; height: 180px;
+    background: radial-gradient(circle, rgba(240,200,210,0.18) 0%, transparent 70%);
+    top: 40%; left: -60px;
+  }
+  .deco-blob2 {
+    width: 140px; height: 140px;
+    background: radial-gradient(circle, rgba(220,180,200,0.15) 0%, transparent 70%);
+    top: 20%; right: -40px;
+  }
+  .botanical {
+    position: fixed;
+    pointer-events: none;
+    z-index: 0;
+    width: 140px;
+    height: 140px;
+    opacity: 0.22;
+  }
+  .botanical-tl { top: -10px; left: -10px; }
+  .botanical-br { bottom: -10px; right: -10px; }
+
+  .screen {
+    display: none;
+    width: 100%;
+    max-width: 480px;
+    animation: fadeIn 0.35s ease;
+    position: relative;
+    z-index: 1;
+  }
+  .screen.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ===== スタート画面 ===== */
+  .start-card {
+    background: white;
+    border-radius: 28px;
+    overflow: hidden;
+    box-shadow: 0 8px 40px rgba(180,120,140,0.18);
+    text-align: center;
+  }
+  .start-photo-wrap {
+    position: relative;
+    width: 100%;
+    height: 220px;
+    overflow: hidden;
+  }
+  .start-photo-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 40%;
+  }
+  .start-photo-wrap::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 80px;
+    background: linear-gradient(to bottom, transparent, white);
+  }
+  .start-body { padding: 8px 28px 36px; }
+  .start-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #c47898, #dda0b8);
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 5px 16px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+    margin-bottom: 18px;
+  }
+  .start-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #3a2b38;
+    line-height: 1.55;
+    margin-bottom: 12px;
+  }
+  .start-title span { color: #c47898; }
+  .start-sub {
+    font-size: 13px;
+    color: #9a7888;
+    line-height: 1.9;
+    margin-bottom: 24px;
+  }
+  .start-info {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 28px;
+    border: 1.5px solid #f0e0e8;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .start-info-item {
+    flex: 1;
+    padding: 14px 0;
+    text-align: center;
+    border-right: 1.5px solid #f0e0e8;
+  }
+  .start-info-item:last-child { border-right: none; }
+  .start-info-num {
+    font-size: 26px;
+    font-weight: 700;
+    color: #c47898;
+  }
+  .start-info-label {
+    font-size: 11px;
+    color: #b09098;
+    margin-top: 2px;
+  }
+  .btn-start {
+    width: 100%;
+    background: linear-gradient(135deg, #c47898, #dda0b8);
+    color: white;
+    font-size: 17px;
+    font-weight: 700;
+    padding: 17px;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(196,120,152,0.38);
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    letter-spacing: 1px;
+  }
+
+  /* ===== クイズ画面 ===== */
+  .quiz-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .quiz-progress-text {
+    font-size: 13px;
+    color: #9a7888;
+    font-weight: 600;
+  }
+  .quiz-score {
+    font-size: 13px;
+    color: #c47898;
+    font-weight: 700;
+  }
+  .progress-bar-bg {
+    height: 6px;
+    background: #f0e0e8;
+    border-radius: 3px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(to right, #c47898, #e8b4c8);
+    border-radius: 3px;
+    transition: width 0.4s ease;
+  }
+  .quiz-card {
+    background: white;
+    border-radius: 24px;
+    padding: 30px 26px;
+    box-shadow: 0 8px 32px rgba(180,120,140,0.13);
+    margin-bottom: 14px;
+  }
+  .quiz-num {
+    font-size: 12px;
+    color: #c47898;
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+  }
+  .quiz-question {
+    font-size: 19px;
+    font-weight: 700;
+    color: #3a2b38;
+    line-height: 1.7;
+    margin-bottom: 24px;
+  }
+  .choices {
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+  }
+  .choice-btn {
+    width: 100%;
+    background: #fdf8f5;
+    border: 2px solid #ede0d8;
+    border-radius: 14px;
+    padding: 15px 18px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #3a2b38;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    line-height: 1.4;
+    position: relative;
+  }
+  .choice-btn:active { transform: scale(0.98); }
+  .choice-btn.correct {
+    background: #edf9f2;
+    border-color: #5bbf8a;
+    color: #1e6640;
+  }
+  .choice-btn.wrong {
+    background: #fff0f3;
+    border-color: #e88aa0;
+    color: #a03050;
+  }
+  .choice-btn:disabled { cursor: default; }
+
+  /* 解説エリア */
+  .explanation {
+    display: none;
+    margin-top: 18px;
+    animation: fadeIn 0.3s ease;
+  }
+  .explanation.show { display: block; }
+
+  .answer-badge {
+    display: inline-block;
+    font-size: 20px;
+    font-weight: 700;
+    padding: 8px 20px;
+    border-radius: 30px;
+    margin-bottom: 12px;
+    animation: badgePop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  @keyframes badgePop {
+    0%   { transform: scale(0.4); opacity: 0; }
+    70%  { transform: scale(1.12); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .answer-badge.correct-badge {
+    background: #edf9f2;
+    color: #1e6640;
+    border: 2px solid #5bbf8a;
+  }
+  .answer-badge.wrong-badge {
+    background: #fff0f3;
+    color: #a03050;
+    border: 2px solid #e88aa0;
+  }
+
+  .explanation-box {
+    background: #fdf6f2;
+    border-left: 4px solid #c47898;
+    border-radius: 0 12px 12px 0;
+    padding: 14px 16px;
+    font-size: 14px;
+    color: #5a4050;
+    line-height: 1.85;
+  }
+
+  .btn-next {
+    width: 100%;
+    background: linear-gradient(135deg, #c47898, #dda0b8);
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    padding: 16px;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    margin-top: 14px;
+    display: none;
+    box-shadow: 0 4px 16px rgba(196,120,152,0.35);
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  .btn-next.show { display: block; }
+
+  /* ===== コンフェッティ ===== */
+  .confetti-piece {
+    position: fixed;
+    top: -10px;
+    pointer-events: none;
+    z-index: 9999;
+    animation: confettiFall linear forwards;
+    border-radius: 2px;
+  }
+  @keyframes confettiFall {
+    0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+    80%  { opacity: 1; }
+    100% { transform: translateY(100vh) rotate(var(--rot)); opacity: 0; }
+  }
+
+  /* ===== 結果画面 ===== */
+  .result-card {
+    background: white;
+    border-radius: 28px;
+    padding: 40px 28px 36px;
+    box-shadow: 0 8px 40px rgba(180,120,140,0.18);
+    text-align: center;
+  }
+  .result-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #c47898, #dda0b8);
+    color: white;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 6px 18px;
+    border-radius: 20px;
+    margin-bottom: 24px;
+  }
+  .result-score-box {
+    background: linear-gradient(135deg, #fdf4ee, #faeef4);
+    border-radius: 20px;
+    padding: 22px;
+    margin-bottom: 24px;
+  }
+  .result-score-label {
+    font-size: 13px;
+    color: #9a7888;
+    margin-bottom: 6px;
+  }
+  .result-score-num {
+    font-size: 54px;
+    font-weight: 700;
+    color: #c47898;
+    line-height: 1;
+  }
+  .result-score-num span {
+    font-size: 18px;
+    color: #9a7888;
+  }
+  .result-message {
+    font-size: 21px;
+    font-weight: 700;
+    color: #3a2b38;
+    line-height: 1.65;
+    margin-bottom: 10px;
+  }
+  .result-message .pink { color: #c47898; }
+  .result-sub {
+    font-size: 14px;
+    color: #7a5870;
+    line-height: 1.85;
+    margin-bottom: 28px;
+  }
+  .cta-box {
+    background: linear-gradient(150deg, #b86888 0%, #c47898 50%, #cc8aaa 100%);
+    border-radius: 20px;
+    padding: 24px 22px;
+    margin-bottom: 14px;
+    box-shadow: 0 8px 28px rgba(180,100,130,0.45);
+    text-align: left;
+  }
+  .cta-limited {
+    display: inline-block;
+    background: rgba(255,255,255,0.25);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 20px;
+    letter-spacing: 1.5px;
+    margin-bottom: 12px;
+  }
+  .cta-headline {
+    font-size: 24px;
+    font-weight: 700;
+    color: white;
+    line-height: 1.4;
+    margin-bottom: 6px;
+    letter-spacing: 0.5px;
+  }
+  .cta-headline span {
+    font-size: 13px;
+    font-weight: 600;
+    opacity: 0.85;
+    display: block;
+    margin-bottom: 2px;
+  }
+  .cta-notice {
+    font-size: 11px;
+    color: rgba(255,255,255,0.75);
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+  }
+  .cta-instruction {
+    font-size: 13px;
+    color: white;
+    font-weight: 600;
+    line-height: 1.9;
+    margin-bottom: 16px;
+  }
+  .cta-instruction strong {
+    font-size: 18px;
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    padding: 2px 12px;
+    border-radius: 6px;
+    letter-spacing: 1px;
+  }
+  .btn-line {
+    width: 100%;
+    background: #06C755;
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    padding: 15px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    box-shadow: 0 4px 12px rgba(6,199,85,0.35);
+  }
+  .retry-btn {
+    width: 100%;
+    background: none;
+    border: 2px solid #e0d0d8;
+    border-radius: 14px;
+    padding: 13px;
+    font-size: 14px;
+    color: #9a7888;
+    font-weight: 600;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+</style>
+</head>
+<body>
+
+<!-- 背景デコ -->
+<div class="deco-blob deco-blob1"></div>
+<div class="deco-blob deco-blob2"></div>
+
+<!-- ボタニカル装飾（左上） -->
+<svg class="botanical botanical-tl" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M10 110 Q30 60 70 20" stroke="#c47898" stroke-width="1.2" stroke-linecap="round"/>
+  <path d="M30 90 Q20 65 40 50" stroke="#c47898" stroke-width="1" stroke-linecap="round"/>
+  <path d="M40 50 Q55 35 48 18" stroke="#c47898" stroke-width="1" stroke-linecap="round"/>
+  <ellipse cx="48" cy="15" rx="7" ry="10" transform="rotate(-20 48 15)" stroke="#c47898" stroke-width="1" fill="none"/>
+  <ellipse cx="28" cy="42" rx="9" ry="6" transform="rotate(40 28 42)" stroke="#c47898" stroke-width="1" fill="none"/>
+  <ellipse cx="18" cy="72" rx="10" ry="6" transform="rotate(30 18 72)" stroke="#c47898" stroke-width="1" fill="none"/>
+  <circle cx="70" cy="20" r="3" stroke="#c47898" stroke-width="1" fill="none"/>
+  <circle cx="68" cy="12" r="2" stroke="#c47898" stroke-width="0.8" fill="none"/>
+  <circle cx="76" cy="17" r="2" stroke="#c47898" stroke-width="0.8" fill="none"/>
+</svg>
+
+<!-- ボタニカル装飾（右下） -->
+<svg class="botanical botanical-br" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M110 10 Q90 60 50 100" stroke="#c47898" stroke-width="1.2" stroke-linecap="round"/>
+  <path d="M90 30 Q100 55 80 70" stroke="#c47898" stroke-width="1" stroke-linecap="round"/>
+  <path d="M80 70 Q65 85 72 102" stroke="#c47898" stroke-width="1" stroke-linecap="round"/>
+  <ellipse cx="72" cy="105" rx="7" ry="10" transform="rotate(20 72 105)" stroke="#c47898" stroke-width="1" fill="none"/>
+  <ellipse cx="92" cy="78" rx="9" ry="6" transform="rotate(-40 92 78)" stroke="#c47898" stroke-width="1" fill="none"/>
+  <ellipse cx="102" cy="48" rx="10" ry="6" transform="rotate(-30 102 48)" stroke="#c47898" stroke-width="1" fill="none"/>
+  <circle cx="50" cy="100" r="3" stroke="#c47898" stroke-width="1" fill="none"/>
+  <circle cx="52" cy="108" r="2" stroke="#c47898" stroke-width="0.8" fill="none"/>
+  <circle cx="44" cy="103" r="2" stroke="#c47898" stroke-width="0.8" fill="none"/>
+</svg>
+
+<!-- スタート画面 -->
+<div class="screen active" id="screen-start">
+  <div class="start-card">
+    <div class="start-photo-wrap">
+      <img src="madoka_photo.jpg" alt="まどか">
+    </div>
+    <div class="start-body">
+      <div class="start-badge">✨ メルカリ知識チェック</div>
+      <div class="start-title">あなたの<span>メルカリ知識</span>、<br>試してみませんか？</div>
+      <div class="start-sub">
+        メルカリのコツ・在宅ワークに関する<br>
+        10問に答えてみてください。<br>
+        ちょっと難しく作ってみたので、<br>
+        全問正解したらすごいと思います！
+      </div>
+      <div class="start-info">
+        <div class="start-info-item">
+          <div class="start-info-num">10</div>
+          <div class="start-info-label">問</div>
+        </div>
+        <div class="start-info-item">
+          <div class="start-info-num">3</div>
+          <div class="start-info-label">択</div>
+        </div>
+        <div class="start-info-item">
+          <div class="start-info-num">3</div>
+          <div class="start-info-label">分</div>
+        </div>
+      </div>
+      <button class="btn-start" onclick="startQuiz()">クイズをスタート ▶</button>
+    </div>
+  </div>
+</div>
+
+<!-- クイズ画面 -->
+<div class="screen" id="screen-quiz">
+  <div class="quiz-header">
+    <div class="quiz-progress-text" id="progress-text">Q1 / 10</div>
+    <div class="quiz-score" id="score-text">正解 0 / 0問</div>
+  </div>
+  <div class="progress-bar-bg">
+    <div class="progress-bar-fill" id="progress-bar" style="width:10%"></div>
+  </div>
+  <div class="quiz-card">
+    <div class="quiz-num" id="quiz-num">Q1</div>
+    <div class="quiz-question" id="quiz-question"></div>
+    <div class="choices" id="choices"></div>
+    <div class="explanation" id="explanation">
+      <div class="answer-badge" id="answer-badge"></div>
+      <div class="explanation-box" id="explanation-text"></div>
+    </div>
+  </div>
+  <button class="btn-next" id="btn-next" onclick="nextQuestion()">次の問題へ →</button>
+</div>
+
+<!-- 結果画面 -->
+<div class="screen" id="screen-result">
+  <div class="result-card">
+    <div class="result-badge">✨ 結果発表</div>
+    <div class="result-score-box">
+      <div class="result-score-label">正解数</div>
+      <div class="result-score-num" id="final-score">0<span> / 10問</span></div>
+    </div>
+    <div class="result-message" id="result-message"></div>
+    <div class="result-sub" id="result-sub"></div>
+    <div class="cta-box">
+      <div class="cta-limited">このクイズ回答者限定</div>
+      <div class="cta-instruction">
+        このクイズを受け取ってくれた方で、<br>メルカリ物販に興味がある方おられますか？
+      </div>
+      <div class="cta-headline">
+        <span>先着3名様</span>
+        特別無料相談 開催します
+      </div>
+      <div class="cta-instruction">
+        毎回すぐに枠が埋まるほどご好評いただいている企画を、<br>久しぶりに開催することにしました。
+      </div>
+      <div class="cta-notice">
+        ※ 次回の開催は未定です<br>
+        ※ 特別無料相談はZoomにて行います。一対一の個別相談なので、<br>　何でも遠慮なくお話ください。
+      </div>
+      <div class="cta-instruction">
+        メルカリ物販について詳しく聞きたい方は、<br>
+        公式LINEに <strong>「特別相談」</strong> と送ってください。<br>
+        下のボタンから公式LINEに飛べます。
+      </div>
+      <button class="btn-line" onclick="openLine()">📲 公式LINEを開く</button>
+    </div>
+    <button class="retry-btn" onclick="retryQuiz()">もう一度チャレンジする</button>
+  </div>
+</div>
+
+<script>
+const questions = [
+  {
+    q: "メルカリで稼ぐには、どんなものを売るかが一番大事だ。",
+    choices: ["はい", "いいえ", "どちらとも言えない"],
+    correct: 1,
+    explanations: [
+      "仕入れて売る場合、何を仕入れるかはもちろん大事です。いかに安く仕入れられるかも利益に直結します。ただ、それ以上に「売り方・見せ方」が大事。やり方さえ分かれば、メルカリは売れないものはないとも言われています。",
+      "正解！何を売るかより、売り方・見せ方・ページの作り方の方が売上を左右します。やり方さえ分かれば、売れる商品の幅は思ってるより広い。仕入れて売る場合も、いかに安く仕入れるかに加えて「どう見せるか」がカギです。",
+      "仕入れ販売では安く仕入れることも大事ですが、実は「売り方」の方がもっと影響します。やり方が分かれば、メルカリは売れないものはないとも言われています。"
+    ]
+  },
+  {
+    q: "商品の写真は、できるだけ一眼レフなどプロっぽい写真にこだわるべきだ。",
+    choices: ["はい", "いいえ", "どちらとも言えない"],
+    correct: 1,
+    explanations: [
+      "実はそうでもないんです。メルカリはスマホで見る人がほとんど。自然光＋白い背景＋スマホで十分売れます。機材より「清潔感」と「明るさ」の方がずっと大事。",
+      "正解！スマホ1台で十分です。大切なのは明るさ・清潔感・背景のシンプルさ。難しいことは何もありません。",
+      "こだわれるなら越したことはないですが、一眼レフは必須ではありません。スマホで撮った写真でも、光と背景を意識するだけで見違えるほど変わります。"
+    ]
+  },
+  {
+    q: "売れない商品は、値下げするのが一番の解決策だ。",
+    choices: ["はい", "いいえ", "どちらとも言えない"],
+    correct: 1,
+    explanations: [
+      "値下げは最終手段。まず疑うべきは写真・タイトル・説明文です。それを直すだけで値段そのままでも売れることがよくあります。また、安すぎると「どこか難があるのかな」と思われ、逆に売れなくなることもあります。",
+      "正解！売れない原因は、値段より「見せ方」にあることがほとんど。写真・タイトル・説明文を見直す方が先です。安すぎると品質に不安を感じさせてしまうことも。値下げは最後の手段です。",
+      "値段が原因のこともゼロではないですが、安すぎると「どこか難があるのかな」と買う側が不安になることも。まず見直すべきは写真・タイトル・説明文です。"
+    ]
+  },
+  {
+    q: "メルカリ物販を始めるには、メルカリの利用経験が必要だ。",
+    choices: ["はい", "いいえ", "どちらとも言えない"],
+    correct: 1,
+    explanations: [
+      "経験があるに越したことはないですが、必須ではありません。メルカリの登録から一緒に始める方もいて、そういった方たちもしっかり結果を出して活躍されています。",
+      "正解！メルカリを使ったことがなくても全然大丈夫。登録から一緒にスタートした方も多く、そういった方たちもとても活躍されています。スマホさえあれば今日からでも始められます。",
+      "あれば多少スムーズですが、なくても問題なし。メルカリの登録から始めた方も多く、そういった方たちも今では活躍されています。"
+    ]
+  },
+  {
+    q: "ハンドメイドや特技がないと、メルカリ物販では稼げない。",
+    choices: ["はい", "いいえ", "どちらとも言えない"],
+    correct: 1,
+    explanations: [
+      "それは誤解です！メルカリ物販は「仕入れて売る」スタイル。作る必要も、得意なことも関係ありません。普通の主婦の方がコツを掴んで稼いでいます。",
+      "正解！特技もハンドメイドも不要です。仕入れた商品を売るだけなので、誰でも始められます。",
+      "特技があると有利な場面もありますが、なくても全く問題なし。仕入れ販売は、特技ゼロでも稼げる仕組みです。"
+    ]
+  },
+  {
+    q: "出品数は多ければ多いほど、売り上げが上がる。",
+    choices: ["はい", "いいえ", "どちらとも言えない"],
+    correct: 0,
+    explanations: [
+      "正解！お店に商品がたくさん並んでいる方が、お客さんも選びやすくて買いたくなりますよね。出品数が多い方が確実に売れやすくなります。ただし、商品ページの質を保ちながら増やすことが大切です。",
+      "数が多い方が目に触れる機会は増えます。品数が少ないお店より、多いお店の方が買いたくなりますよね。出品数を増やすことは売上アップの基本。質を保ちながら増やしていきましょう。",
+      "出品数が多い方が確実に売れやすくなります。品数が多いお店の方が買いたくなるのは自然なこと。ただし、質を保ちながら増やすことが大前提です。"
+    ]
+  },
+  {
+    q: "商品の値段は、ライバルより安く設定するのが一番の売り方だ。",
+    choices: ["はい", "いいえ", "どちらとも言えない"],
+    correct: 1,
+    explanations: [
+      "安くすれば売れやすくはなりますが、利益が取れなければ意味がありません。高くても信頼感があれば買ってもらえますし、安すぎると「なんでこんなに安いんだろう」と不安に思われることも意外と多いんです。",
+      "正解！安ければいいというものではありません。高くても信頼感があれば買ってもらえます。利益が取れてこそ意味があります。安すぎると逆に買う側が不安になることもあります。",
+      "相場から大きく外れるのは問題ですが、一番安くする必要はありません。高くても信頼感で選んでもらえます。安すぎると「なんで安いんだろう」と不安に思われることも。利益をしっかり取れる値段設定が大事です。"
+    ]
+  },
+  {
+    q: "売れるページを作るには、説明文よりも写真の方が大事だ。",
+    choices: ["はい", "いいえ", "どちらとも言えない"],
+    correct: 2,
+    explanations: [
+      "写真は超大事です。でも写真だけで全てが決まるわけではありません。タイトルで検索に引っかかり、写真で興味を持ってもらい、説明文で背中を押す——この3つが揃って売れます。",
+      "説明文も大事ですが、写真を疎かにするのはNG。メルカリは一覧画面で一瞬で判断されます。まず写真で目を止めてもらわないと、説明文すら読まれません。",
+      "正解！写真・タイトル・説明文、全部大事です。写真で目を引き、タイトルで検索に出て、説明文で安心させる。どれか一つでも弱いと売り逃します。"
+    ]
+  },
+  {
+    q: "在宅ワークは、パソコンが得意でないと難しい。",
+    choices: ["はい", "いいえ", "どちらとも言えない"],
+    correct: 1,
+    explanations: [
+      "パソコンが使える方は、パソコンを使った方が便利なこともあります。ただ、私自身はスマホ一台で全て完結しています。メルカリ物販は写真も出品も全部スマホでOKです。",
+      "正解！パソコンが使える方はもちろん活用できますが、私自身スマホ一台で全て完結しています。パソコンが苦手でも全く問題ありません。",
+      "仕事の種類によります。ただメルカリ物販に関しては、パソコンが使える方は便利な場面もありますが、私自身スマホ一台で全て完結しています。"
+    ]
+  },
+  {
+    q: "副業を始めるなら、十分に学んでから動くべきだ。",
+    choices: ["はい", "いいえ", "どちらとも言えない"],
+    correct: 1,
+    explanations: [
+      "学ぶことは大切ですが、「十分に」はキリがありません。よくあるのが、頭でっかちになって始める前に知識だけついて結局動けないパターン。知識だけ得てスタートできないのが一番もったいないです。",
+      "正解！完璧に準備してからより、動きながら学ぶ方が身につきます。頭でっかちになって知識だけついて動けない——これが一番もったいないパターンです。",
+      "最低限の知識は必要ですが、「十分に」を待っていたらいつまでも始められません。知識だけ得てスタートできないのが一番もったいない。"
+    ]
+  }
+];
+
+let current = 0;
+let score = 0;
+let answered = 0;
+
+function startQuiz() {
+  current = 0; score = 0; answered = 0;
+  show('screen-quiz');
+  renderQuestion();
+}
+
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function renderQuestion() {
+  const q = questions[current];
+  document.getElementById('progress-text').textContent = `Q${current + 1} / 10`;
+  document.getElementById('score-text').textContent = `正解 ${score} / ${answered}問`;
+  document.getElementById('progress-bar').style.width = `${(current + 1) * 10}%`;
+  document.getElementById('quiz-num').textContent = `Q${current + 1}`;
+  document.getElementById('quiz-question').textContent = q.q;
+
+  const choicesEl = document.getElementById('choices');
+  choicesEl.innerHTML = '';
+  q.choices.forEach((c, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = c;
+    btn.onclick = () => answer(i, btn);
+    choicesEl.appendChild(btn);
+  });
+
+  document.getElementById('explanation').classList.remove('show');
+  document.getElementById('btn-next').classList.remove('show');
+}
+
+function answer(idx, clickedBtn) {
+  const q = questions[current];
+  answered++;
+  const isCorrect = idx === q.correct;
+  if (isCorrect) score++;
+
+  const btns = document.querySelectorAll('.choice-btn');
+  btns.forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === q.correct) btn.classList.add('correct');
+    else if (i === idx && !isCorrect) btn.classList.add('wrong');
+  });
+
+  const badge = document.getElementById('answer-badge');
+  document.getElementById('explanation-text').textContent = q.explanations[idx];
+
+  if (isCorrect) {
+    badge.textContent = '✅ 正解！';
+    badge.className = 'answer-badge correct-badge';
+    launchSparkles();
+  } else if (idx === 2 && q.correct !== 2) {
+    badge.textContent = '💡 惜しい！';
+    badge.className = 'answer-badge wrong-badge';
+  } else {
+    badge.textContent = '💡 惜しい！';
+    badge.className = 'answer-badge wrong-badge';
+  }
+
+  document.getElementById('explanation').classList.add('show');
+  document.getElementById('score-text').textContent = `正解 ${score} / ${answered}問`;
+
+  const nextBtn = document.getElementById('btn-next');
+  nextBtn.textContent = current < 9 ? '次の問題へ →' : '結果を見る';
+  nextBtn.classList.add('show');
+}
+
+function launchSparkles() {
+  const colors = ['#c47898','#e8b4c8','#f0c878','#dda0b8','#a8d8b0','#7ec8e0','#f5a0b8','#e8d878'];
+  const count = 60;
+  for (let i = 0; i < count; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    const w = 6 + Math.random() * 8;
+    const h = 4 + Math.random() * 6;
+    el.style.width = w + 'px';
+    el.style.height = h + 'px';
+    el.style.left = (Math.random() * 100) + 'vw';
+    el.style.background = colors[Math.floor(Math.random() * colors.length)];
+    el.style.setProperty('--rot', (Math.random() * 720 - 360) + 'deg');
+    const duration = 1.8 + Math.random() * 1.2;
+    el.style.animationDuration = duration + 's';
+    el.style.animationDelay = (Math.random() * 0.4) + 's';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), (duration + 0.6) * 1000);
+  }
+}
+
+function nextQuestion() {
+  current++;
+  if (current >= questions.length) {
+    showResult();
+  } else {
+    renderQuestion();
+  }
+}
+
+function showResult() {
+  show('screen-result');
+  document.getElementById('final-score').innerHTML = `${score}<span> / 10問</span>`;
+
+  let message, sub;
+  if (score >= 8) {
+    message = 'すごい！<span class="pink">知識は十分あります。</span><br>あとは行動するだけ。';
+    sub = 'これだけ知識があれば、メルカリ物販を始めたら結果につながりやすいです。';
+  } else if (score >= 5) {
+    message = '惜しい！<span class="pink">もう半分は分かってます。</span>';
+    sub = '知識が完璧じゃなくても大丈夫。私自身も初めは初心者でした。';
+  } else {
+    message = '<span class="pink">知らなくて当然。</span><br>でも今日知れたことが大事です。';
+    sub = '実は私に問い合わせくれる方は、ほとんどの方がメルカリ経験ゼロです。';
+  }
+
+  document.getElementById('result-message').innerHTML = message;
+  document.getElementById('result-sub').textContent = sub;
+}
+
+function openLine() {
+  window.open('https://lin.ee/ksz6hFg', '_blank');
+}
+
+function retryQuiz() {
+  startQuiz();
+}
+</script>
+</body>
+</html>
